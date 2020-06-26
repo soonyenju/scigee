@@ -19,7 +19,7 @@ setup(
 	long_description = "Read/write and process rs/gis related data, especially atmospheric rs data.",
 	license = "MIT Licence",
 
-	url="https://github.com/soonyenju/pysy",
+	url="https://github.com/soonyenju/scigee",
 	author = "Songyan Zhu",
 	author_email = "soonyenju@foxmail.com",
 
