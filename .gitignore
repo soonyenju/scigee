@@ -1,0 +1,11 @@
+ameriflux_all/
+ameriflux_processed/
+playground/
+.ipynb_checkpoints/
+ameriflux.ipynb
+ameriflux_ggapfill.yaml
+ameriflux_utc_offset.csv
+example.ipynb
+modeling.ipynb
+run_6s.ipynb
+example.ipynb

@@ -13,7 +13,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name = "scigee",
-	version = "0.0.2",
+	version = "0.0.4",
 	keywords = ("easy geo warpper", "atmospheric data","satellite data", "flux"),
 	description = "For faster proccessing geofile",
 	long_description = "Read/write and process rs/gis related data, especially atmospheric rs data.",
@@ -36,6 +36,8 @@ setup(
             # "numpy==1.16.0",
 			# "geopandas",
 			# "rasterio"
+			"pygal",
+			"geetools"
 
 	]
 )
