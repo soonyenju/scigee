@@ -327,6 +327,42 @@ class DataInfo:
         ]
         scale = 500
         return collection, bands, label_bands, scale
+    # -------------------------------------------------------------------------------------------------------------- 
+    @staticmethod
+    def modis_gpp_aqua():
+        collection = "MODIS/006/MYD17A2H" # 8-Day Aqua
+        bands = [
+                'Gpp', 'PsnNet'
+        ]
+        label_bands = [
+                    'GPP', 'NEE'
+        ]
+        scale = 500
+        return collection, bands, label_bands, scale
+    # -------------------------------------------------------------------------------------------------------------- 
+    @staticmethod
+    def modis_evi():
+        collection = "MODIS/MOD09GA_006_EVI" # Daily Terra
+        bands = [
+                'EVI',
+        ]
+        label_bands = [
+                    'EVI'
+        ]
+        scale = 500
+        return collection, bands, label_bands, scale
+    # -------------------------------------------------------------------------------------------------------------- 
+    @staticmethod
+    def modis_ndvi():
+        collection = "MODIS/MOD09GA_006_NDVI" # Daily Terra
+        bands = [
+                'NDVI',
+        ]
+        label_bands = [
+                    'NDVI'
+        ]
+        scale = 500
+        return collection, bands, label_bands, scale
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
     def modis_net_evapo(): # net_evapotranspiration
@@ -359,6 +395,14 @@ class DataInfo:
         label_bands = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "sr_atmos_opacity", "sr_cloud_qa"]
         scale = 30
         return collection, bands, label_bands, scale    
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def landsat8_srt1():
+        collection = "LANDSAT/LC08/C01/T1_SR"
+        bands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'sr_aerosol']
+        label_bands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'sr_aerosol']
+        scale = 30
+        return collection, bands, label_bands, scale
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
     def get_cfsv2():
@@ -414,3 +458,73 @@ class DataInfo:
         ]
         scale = 450 # 15 arc seconds 1 arc second = 30 meters
         return collection, bands, label_bands, scale
+
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    # Sentinel-2 MSI Level-1C
+    def s2_msi1C():
+        collection = "COPERNICUS/S2"
+        bands = [
+            'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 
+            'B8', 'B8A', 'B9', 'B10', 'B11', 'B12',
+            'QA10', 'QA20', 'QA60'
+        ]
+        label_bands = [
+            'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 
+            'B8', 'B8A', 'B9', 'B10', 'B11', 'B12',
+            'QA10', 'QA20', 'QA60'
+        ]
+
+        scale = 10 # 10 m for most bands
+        return collection, bands, label_bands, scale
+
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    # Sentinel-2 MSI Level-2A
+    def s2_msi2A():
+        collection = "COPERNICUS/S2_SR"
+        bands = [
+            'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 
+            'B8', 'B8A', 'B9', 'B11', 'B12',
+            'AOT', 'WVP', 'SCL', 'TCI_R', 'TCI_G', 'TCI_B',
+            'MSK_CLDPRB', 'MSK_SNWPRB', 
+            'QA10', 'QA20', 'QA60'
+        ]
+        label_bands = [
+            'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 
+            'B8', 'B8A', 'B9', 'B11', 'B12',
+            'AOT', 'WVP', 'SCL', 'TCI_R', 'TCI_G', 'TCI_B',
+            'MSK_CLDPRB', 'MSK_SNWPRB', 
+            'QA10', 'QA20', 'QA60'
+        ]
+
+        scale = 10 # 10 m for most bands
+        return collection, bands, label_bands, scale
+    
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    # Sentinel-3 OLCI dataset
+    def s3_olci():
+        collection = "COPERNICUS/S3/OLCI"
+        bands = [
+                'Oa01_radiance', 'Oa02_radiance', 'Oa03_radiance', 'Oa04_radiance', 'Oa05_radiance',
+                'Oa06_radiance', 'Oa07_radiance', 'Oa08_radiance', 'Oa09_radiance', 'Oa10_radiance',
+                'Oa11_radiance', 'Oa12_radiance', 'Oa13_radiance', 'Oa14_radiance', 'Oa15_radiance',
+                'Oa16_radiance', 'Oa17_radiance', 'Oa18_radiance', 'Oa19_radiance', 'Oa20_radiance', 'Oa21_radiance'
+        ]
+        label_bands = ['oa01', 'oa02', 'oa03', 'oa04', 'oa05',
+                    'oa06', 'oa07', 'oa08', 'oa09', 'oa10',
+                    'oa11', 'oa12', 'oa13', 'oa14', 'oa15',
+                    'oa16', 'oa17', 'oa18', 'oa19', 'oa20', 'oa21'
+        ]
+
+        # rad_scale * band -> radiace
+        # in order: band1 -> band21
+        rad_scale = [
+                    0.0139465, 0.0133873, 0.0121481, 0.0115198, 0.0100953,
+                    0.0123538, 0.00879161, 0.00876539, 0.0095103, 0.00773378,
+                    0.00675523, 0.0071996, 0.00749684, 0.0086512, 0.00526779,
+                    0.00530267, 0.00493004, 0.00549962, 0.00502847, 0.00326378, 0.00324118
+        ]
+        scale = 300
+        return collection, bands, label_bands, scale, rad_scale
