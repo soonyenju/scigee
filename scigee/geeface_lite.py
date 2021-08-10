@@ -353,8 +353,32 @@ class DataInfo:
         return collection, bands, label_bands, scale
     # -------------------------------------------------------------------------------------------------------------- 
     @staticmethod
+    def modis_evi_aqua():
+        collection = "MODIS/MYD09GA_006_EVI" # Daily Aqua
+        bands = [
+                'EVI',
+        ]
+        label_bands = [
+                    'EVI'
+        ]
+        scale = 500
+        return collection, bands, label_bands, scale
+    # -------------------------------------------------------------------------------------------------------------- 
+    @staticmethod
     def modis_ndvi():
         collection = "MODIS/MOD09GA_006_NDVI" # Daily Terra
+        bands = [
+                'NDVI',
+        ]
+        label_bands = [
+                    'NDVI'
+        ]
+        scale = 500
+        return collection, bands, label_bands, scale
+    # -------------------------------------------------------------------------------------------------------------- 
+    @staticmethod
+    def modis_ndvi_aqua():
+        collection = "MODIS/MYD09GA_006_NDVI" # Daily Aqua
         bands = [
                 'NDVI',
         ]
@@ -389,8 +413,44 @@ class DataInfo:
         return collection, bands, label_bands, scale
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
+    def landsat7_ndvi():
+        collection = "LANDSAT/LE07/C01/T1_8DAY_NDVI" # 8-Day
+        bands = [
+            'NDVI'
+        ]
+        label_bands = [
+            'NDVI'
+        ]
+        scale = 30
+        return collection, bands, label_bands, scale
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def landsat8_evi():
+        collection = "LANDSAT/LC08/C01/T1_8DAY_EVI" # 8-Day
+        bands = [
+            'EVI'
+        ]
+        label_bands = [
+            'EVI'
+        ]
+        scale = 30
+        return collection, bands, label_bands, scale
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def landsat8_ndvi():
+        collection = "LANDSAT/LC08/C01/T1_8DAY_NDVI" # 8-Day
+        bands = [
+            'NDVI'
+        ]
+        label_bands = [
+            'NDVI'
+        ]
+        scale = 30
+        return collection, bands, label_bands, scale
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
     def landsat7_srt1():
-        collection = "LANDSAT/LE07/C01/T1_SR"
+        collection = "LANDSAT/LE07/C02/T1_L2"
         bands = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "sr_atmos_opacity", "sr_cloud_qa"]
         label_bands = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "sr_atmos_opacity", "sr_cloud_qa"]
         scale = 30
@@ -398,7 +458,7 @@ class DataInfo:
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
     def landsat8_srt1():
-        collection = "LANDSAT/LC08/C01/T1_SR"
+        collection = "LANDSAT/LC08/C02/T1_L2"
         bands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'sr_aerosol']
         label_bands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'sr_aerosol']
         scale = 30
