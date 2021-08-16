@@ -317,73 +317,46 @@ class DataInfo:
         return collection, bands, label_bands, scale
     # -------------------------------------------------------------------------------------------------------------- 
     @staticmethod
-    def modis_gpp():
-        collection = "MODIS/006/MOD17A2H" # 8-Day # Terra; Aqua: MODIS/006/MYD17A2H
+    def modis_gpp(sat = "Terra"):
+        if sat == "Terra":
+            collection = "MODIS/006/MOD17A2H" # 8-Day # Terra; Aqua: MODIS/006/MYD17A2H
+        else:
+            collection = "MODIS/006/MYD17A2H" # 8-Day Aqua
         bands = [
                 'Gpp', 'PsnNet'
         ]
         label_bands = [
-                    'GPP', 'NEE'
+                'GPP', 'NEE'
         ]
         scale = 500
         return collection, bands, label_bands, scale
     # -------------------------------------------------------------------------------------------------------------- 
     @staticmethod
-    def modis_gpp_aqua():
-        collection = "MODIS/006/MYD17A2H" # 8-Day Aqua
-        bands = [
-                'Gpp', 'PsnNet'
-        ]
-        label_bands = [
-                    'GPP', 'NEE'
-        ]
-        scale = 500
-        return collection, bands, label_bands, scale
-    # -------------------------------------------------------------------------------------------------------------- 
-    @staticmethod
-    def modis_evi():
-        collection = "MODIS/MOD09GA_006_EVI" # Daily Terra
+    def modis_evi(sat = "Terra"):
+        if sat == "Terra":
+            collection = "MODIS/MOD09GA_006_EVI" # Daily Terra
+        else:
+            collection = "MODIS/MYD09GA_006_EVI" # Daily Aqua
         bands = [
                 'EVI',
         ]
         label_bands = [
-                    'EVI'
+                'EVI'
         ]
         scale = 500
         return collection, bands, label_bands, scale
     # -------------------------------------------------------------------------------------------------------------- 
     @staticmethod
-    def modis_evi_aqua():
-        collection = "MODIS/MYD09GA_006_EVI" # Daily Aqua
-        bands = [
-                'EVI',
-        ]
-        label_bands = [
-                    'EVI'
-        ]
-        scale = 500
-        return collection, bands, label_bands, scale
-    # -------------------------------------------------------------------------------------------------------------- 
-    @staticmethod
-    def modis_ndvi():
-        collection = "MODIS/MOD09GA_006_NDVI" # Daily Terra
+    def modis_ndvi(sat = "Terra"):
+        if sat == "Terra":
+            collection = "MODIS/MOD09GA_006_NDVI" # Daily Terra
+        else:
+            collection = "MODIS/MYD09GA_006_NDVI" # Daily Aqua
         bands = [
                 'NDVI',
         ]
         label_bands = [
-                    'NDVI'
-        ]
-        scale = 500
-        return collection, bands, label_bands, scale
-    # -------------------------------------------------------------------------------------------------------------- 
-    @staticmethod
-    def modis_ndvi_aqua():
-        collection = "MODIS/MYD09GA_006_NDVI" # Daily Aqua
-        bands = [
-                'NDVI',
-        ]
-        label_bands = [
-                    'NDVI'
+                'NDVI'
         ]
         scale = 500
         return collection, bands, label_bands, scale
@@ -401,8 +374,13 @@ class DataInfo:
         return collection, bands, label_bands, scale
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def landsat7_evi():
-        collection = "LANDSAT/LE07/C01/T1_8DAY_EVI" # 8-Day
+    def landsat7_evi(nday = 8):
+        if nday == 8:
+            collection = "LANDSAT/LE07/C01/T1_8DAY_EVI" # 8-Day
+        elif nday == 32:
+            collection = "LANDSAT/LE07/C01/T1_32DAY_EVI" # 32-Day
+        else:
+            collection = "LANDSAT/LE07/C01/T1_ANNUAL_EVI" # Annual
         bands = [
             'EVI'
         ]
@@ -411,10 +389,16 @@ class DataInfo:
         ]
         scale = 30
         return collection, bands, label_bands, scale
+
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def landsat7_ndvi():
-        collection = "LANDSAT/LE07/C01/T1_8DAY_NDVI" # 8-Day
+    def landsat7_ndvi(nday = 8):
+        if nday == 8:
+            collection = "LANDSAT/LE07/C01/T1_8DAY_NDVI" # 8-Day
+        elif nday == 32:
+            collection = "LANDSAT/LE07/C01/T1_32DAY_NDVI" # 32-Day
+        else:
+            collection = "LANDSAT/LE07/C01/T1_ANNUAL_NDVI" # Annual
         bands = [
             'NDVI'
         ]
@@ -425,8 +409,13 @@ class DataInfo:
         return collection, bands, label_bands, scale
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def landsat8_evi():
-        collection = "LANDSAT/LC08/C01/T1_8DAY_EVI" # 8-Day
+    def landsat8_evi(nday = 8):
+        if nday == 8:
+            collection = "LANDSAT/LC08/C01/T1_8DAY_EVI" # 8-Day
+        elif nday == 32:
+            collection = "LANDSAT/LC08/C01/T1_32DAY_EVI" # 32-Day
+        else:
+            collection = "LANDSAT/LC08/C01/T1_ANNUAL_EVI" # Annual
         bands = [
             'EVI'
         ]
@@ -437,8 +426,13 @@ class DataInfo:
         return collection, bands, label_bands, scale
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def landsat8_ndvi():
-        collection = "LANDSAT/LC08/C01/T1_8DAY_NDVI" # 8-Day
+    def landsat8_ndvi(nday = 8):
+        if nday == 8:
+            collection = "LANDSAT/LC08/C01/T1_8DAY_NDVI" # 8-Day
+        elif nday == 32:
+            collection = "LANDSAT/LC08/C01/T1_32DAY_NDVI" # 32-Day
+        else:
+            collection = "LANDSAT/LC08/C01/T1_ANNUAL_NDVI" # Annual
         bands = [
             'NDVI'
         ]
