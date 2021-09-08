@@ -235,8 +235,11 @@ class DataInfo:
       pass
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def s5p_o3(): # start from 2018-09-08
-        collection = "COPERNICUS/S5P/NRTI/L3_O3" # "COPERNICUS/S5P/OFFL/L3_O3"
+    def s5p_o3(NTRI = True): # start from 2018-09-08
+        if NTRI:
+            collection = "COPERNICUS/S5P/NRTI/L3_O3"
+        else:
+            collection = "COPERNICUS/S5P/OFFL/L3_O3"
         bands = [
                 "O3_column_number_density", "O3_column_number_density_amf", "O3_slant_column_number_density",
                 "O3_effective_temperature", "cloud_fraction", 
@@ -245,14 +248,17 @@ class DataInfo:
         label_bands = [
                     "o3_vcd", "o3_amf", "o3_scd",
                     "o3_temperature", "s5p_cloud_fraction",
-                    "s5p_sen_azi", "s5p_sen_zen", "s5p_sun_zai", "s5p_sun_zen"
+                    "s5p_sen_azi", "s5p_sen_zen", "s5p_sun_azi", "s5p_sun_zen"
         ]
         scale = 0.01 * 100 * 1000 # 0.01 arc degree -> meters
         return collection, bands, label_bands, scale
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def s5p_hcho(): # start from 2018-10-02
-        collection = "COPERNICUS/S5P/NRTI/L3_HCHO"
+    def s5p_hcho(NTRI = True): # start from 2018-10-02
+        if NTRI:
+            collection = "COPERNICUS/S5P/NRTI/L3_HCHO"
+        else:
+            collection = "COPERNICUS/S5P/OFFL/L3_HCHO"
         bands = [
                 "tropospheric_HCHO_column_number_density", "tropospheric_HCHO_column_number_density_amf", "HCHO_slant_column_number_density",
                 "cloud_fraction",
@@ -261,14 +267,17 @@ class DataInfo:
         label_bands = [
                     "hcho_vcd", "hcho_amf", "hcho_scd",
                     "s5p_cloud_fraction",
-                    "s5p_sen_azi", "s5p_sen_zen", "s5p_sun_zai", "s5p_sun_zen"
+                    "s5p_sen_azi", "s5p_sen_zen", "s5p_sun_azi", "s5p_sun_zen"
         ]
         scale = 0.01 * 100 * 1000 # 0.01 arc degree -> meters
         return collection, bands, label_bands, scale
     # --------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def s5p_no2(): # start from 2018-07-10
-        collection = "COPERNICUS/S5P/NRTI/L3_NO2"
+    def s5p_no2(NTRI = True): # start from 2018-07-10
+        if NTRI:
+            collection = "COPERNICUS/S5P/NRTI/L3_NO2"
+        else:
+            collection = "COPERNICUS/S5P/OFFL/L3_NO2"
         bands = [
                 "NO2_column_number_density", "tropospheric_NO2_column_number_density", "stratospheric_NO2_column_number_density",
                 "NO2_slant_column_number_density", "tropopause_pressure", "absorbing_aerosol_index", "cloud_fraction",
@@ -277,7 +286,82 @@ class DataInfo:
         label_bands = [
                     "no2_total_vcd", "no2_vcd", "no2_strato_vcd", "no2_scd",
                     "tropopause_pressure", "absorbing_aerosol_index", "s5p_cloud_fraction",
-                    "sp5_sen_alt", "s5p_sen_azi", "s5p_sen_zen", "s5p_sun_zai", "s5p_sun_zen"
+                    "sp5_sen_alt", "s5p_sen_azi", "s5p_sen_zen", "s5p_sun_azi", "s5p_sun_zen"
+        ]
+        scale = 0.01 * 100 * 1000 # 0.01 arc degree -> meters
+        return collection, bands, label_bands, scale
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def s5p_co(NTRI = True): # start from 2018-06-28
+        if NTRI:
+            collection = "COPERNICUS/S5P/NRTI/L3_CO"
+        else:
+            collection = "COPERNICUS/S5P/OFFL/L3_CO"
+        bands = [
+                "CO_column_number_density", "H2O_column_number_density", "cloud_height",
+                "sensor_altitude", "sensor_azimuth_angle", "sensor_zenith_angle", "solar_azimuth_angle", "solar_zenith_angle"
+        ]
+        label_bands = [
+                    "co_vcd", "h2o_vcd", "cloud_height",
+                    "sp5_sen_alt", "s5p_sen_azi", "s5p_sen_zen", "s5p_sun_azi", "s5p_sun_zen"
+        ]
+        scale = 0.01 * 100 * 1000 # 0.01 arc degree -> meters
+        return collection, bands, label_bands, scale
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def s5p_so2(NTRI = True): # start from 2018-07-10
+        if NTRI:
+            collection = "COPERNICUS/S5P/NRTI/L3_SO2"
+        else:
+            collection = "COPERNICUS/S5P/OFFL/L3_SO2"
+        bands = [
+                "SO2_column_number_density", "SO2_column_number_density_amf", "SO2_slant_column_number_density",
+                "absorbing_aerosol_index", "cloud_fraction",
+                "sensor_azimuth_angle", "sensor_zenith_angle", "solar_azimuth_angle", "solar_zenith_angle",
+                "SO2_column_number_density_15km"
+        ]
+        label_bands = [
+                    "so2_vcd", "so2_amf", "hcho_scd",
+                    "s5p_aai", "s5p_cloud_fraction",
+                    "s5p_sen_azi", "s5p_sen_zen", "s5p_sun_azi", "s5p_sun_zen",
+                    "so2_vcd_15km"
+        ]
+        scale = 0.01 * 100 * 1000 # 0.01 arc degree -> meters
+        return collection, bands, label_bands, scale
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def s5p_ch4(NTRI = True): # start from 2019-02-08
+        if NTRI:
+            collection = "COPERNICUS/S5P/NRTI/L3_CH4"
+        else:
+            collection = "COPERNICUS/S5P/OFFL/L3_CH4"
+        bands = [
+            "CH4_column_volume_mixing_ratio_dry_air", 
+            "aerosol_height", "aerosol_optical_depth",
+            "sensor_azimuth_angle", "sensor_zenith_angle",
+            "solar_azimuth_angle", "solar_zenith_angle"
+        ]
+        label_bands = [
+                    "xch4", "aerosol_height", "aod", 
+                    "s5p_sen_azi", "s5p_sen_zen", 
+                    "s5p_sun_azi", "s5p_sun_zen"
+        ]
+        scale = 0.01 * 100 * 1000 # 0.01 arc degree -> meters
+        return collection, bands, label_bands, scale
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def s5p_aai(NTRI = True): # start from 2018-07-04
+        if NTRI:
+            collection = "COPERNICUS/S5P/NRTI/L3_AER_AI"
+        else:
+            collection = "COPERNICUS/S5P/OFFL/L3_AER_AI"
+        bands = [
+            "absorbing_aerosol_index", "sensor_altitude", "sensor_azimuth_angle", "sensor_zenith_angle",
+            "solar_azimuth_angle", "solar_zenith_angle"
+        ]
+        label_bands = [
+                    "aai", "sp5_sen_alt", "s5p_sen_azi", "s5p_sen_zen", 
+                    "s5p_sun_azi", "s5p_sun_zen"
         ]
         scale = 0.01 * 100 * 1000 # 0.01 arc degree -> meters
         return collection, bands, label_bands, scale
