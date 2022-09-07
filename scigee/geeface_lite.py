@@ -666,3 +666,33 @@ class DataInfo:
         ]
         scale = 300
         return collection, bands, label_bands, scale, rad_scale
+
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def AVHRR_reflectance():
+        collection = "NOAA/CDR/AVHRR/SR/V5"
+        bands = [
+            'SREFL_CH1', 'SREFL_CH2', 'SREFL_CH3', 'BT_CH3', 'BT_CH4', 'BT_CH5'
+        ]
+        label_bands = [
+            'SREFL_CH1', 'SREFL_CH2', 'SREFL_CH3', 'BT_CH3', 'BT_CH4', 'BT_CH5'
+        ]
+        scale = 5566
+        return collection, bands, label_bands, scale
+
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def ERA5_hourly():
+        # ERA5-Land Hourly - ECMWF Climate Reanalysis
+        collection = "ECMWF/ERA5_LAND/HOURLY"
+        bands  = [
+            'surface_solar_radiation_downwards', 'surface_thermal_radiation_downwards',
+            'dewpoint_temperature_2m', 'temperature_2m', 'soil_temperature_level_1', 
+            'u_component_of_wind_10m', 'v_component_of_wind_10m', 
+            'total_precipitation', 'surface_pressure',
+        ]
+        label_bands = [
+            'SWIN', 'LWIN', 'D2m', 'T2m', 'Tsoil1', 'U', 'V', 'P', 'PA'
+        ]
+        scale = 11132
+        return collection, bands, label_bands, scale
