@@ -11,3 +11,5 @@ from .canvas import *
 __all__ += ["Canvas"]
 from .geeface_lite import DataInfo
 __all__ += ["DataInfo"]
+from .ee_export import ee_export_image, ee_export_image_collection
+__all__ += ["ee_export_image", "ee_export_image_collection"]
