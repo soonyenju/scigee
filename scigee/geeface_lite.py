@@ -696,3 +696,22 @@ class DataInfo:
         ]
         scale = 11132
         return collection, bands, label_bands, scale
+
+    # --------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def modis_lc(): # 2001-01-01T00:00:00Z - 2019-01-01T00:00:00
+        collection = "MODIS/006/MCD12Q1"
+        bands = [
+            "LC_Type1", "LC_Type2", "LC_Type3", "LC_Type4", "LC_Type5", 
+            "LC_Prop1_Assessment", "LC_Prop2_Assessment", "LC_Prop3_Assessment", 
+            "LC_Prop1", "LC_Prop2", "LC_Prop3", 
+            "QC", "LW"
+        ]
+        label_bands = [
+            "LC_Type1", "LC_Type2", "LC_Type3", "LC_Type4", "LC_Type5", 
+            "LC_Prop1_Assessment", "LC_Prop2_Assessment", "LC_Prop3_Assessment", 
+            "LC_Prop1", "LC_Prop2", "LC_Prop3", 
+            "QC", "LW"
+        ]
+        scale = 500 # meters
+        return collection, bands, label_bands, scale
