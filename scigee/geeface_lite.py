@@ -169,6 +169,30 @@ def region2arrayB(image: ee.Image, roi: ee.Geometry, band: str, scale: float, ma
     df = pd.DataFrame(zip(data, lats, lons), columns = [band, "latitude", "longitude"])
     return df
 
+def region2arrayC(image: ee.Image, roi: ee.Geometry, bands: list, scale: float, max_pixels: int = 1e9, mask_value: float = -9999) -> pd.DataFrame:
+    """
+    Get pixel values and coordinates of a region as a dataframe.
+    Extract pixles values, longitudes, and latitudes seprately, as a plan B for region2array.
+    """
+    image = image.addBands(ee.Image.pixelLonLat())
+    image = image.unmask(mask_value)
+    # ee.Image -> ee.dictionary.Dictionary
+    image = image.reduceRegion(
+        reducer = ee.Reducer.toList(),
+        # crs = 'EPSG:4326',
+        geometry = roi,
+        maxPixels = 1e13,
+        scale = scale
+    )
+    data_list = []
+    for band in bands:
+        data = np.array((ee.Array(image.get(band)).getInfo()))
+        data_list.append(data)
+    lats = np.array((ee.Array(image.get("latitude")).getInfo()))
+    lons = np.array((ee.Array(image.get("longitude")).getInfo()))
+    df = pd.DataFrame(zip(*data_list, lats, lons), columns = bands + ["latitude", "longitude"])
+    return df
+
 def region2array_obs(image: ee.Image, band: str or list, roi: ee.Geometry, proj: ee.Projection, scale: np.float, max_pixels: int = 1e9, pick_coords: bool = False):
     """
     Obsolete region2array function, will be deprecated.
