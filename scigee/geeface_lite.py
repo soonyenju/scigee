@@ -88,7 +88,7 @@ def proj_epsg(epsg: int or str = 4326) -> ee.Projection:
     proj = ee.Projection(f'EPSG:{epsg}')
     return proj
  
-def get_scale(image: ee.Image) -> np.float:
+def get_scale(image: ee.Image) -> float:
     scale = image.projection().nominalScale().getInfo()
     return scale
  
@@ -193,7 +193,7 @@ def region2arrayC(image: ee.Image, roi: ee.Geometry, bands: list, scale: float, 
     df = pd.DataFrame(zip(*data_list, lats, lons), columns = bands + ["latitude", "longitude"])
     return df
 
-def region2array_obs(image: ee.Image, band: str or list, roi: ee.Geometry, proj: ee.Projection, scale: np.float, max_pixels: int = 1e9, pick_coords: bool = False):
+def region2array_obs(image: ee.Image, band: str or list, roi: ee.Geometry, proj: ee.Projection, scale: float, max_pixels: int = 1e9, pick_coords: bool = False):
     """
     Obsolete region2array function, will be deprecated.
     """
