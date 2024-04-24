@@ -177,7 +177,7 @@ class Emagebox(object):
         try:
             values = np.array((ee.Array(latlng.get(band)).getInfo()))
         except:
-            values = np.full_like(lats, np.nan, dtype = np.float64)
+            values = np.full_like(lats, np.nan, dtype = float)
         # self.values = list(values) ## print as list to check
 
         if not (values.shape == lats.shape == lons.shape):
