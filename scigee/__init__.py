@@ -2,7 +2,8 @@ import ee
 ee.Initialize()
 
 from . import geeface_lite as gf
-__all__ = ["gf"]
+from . import geelite
+__all__ = ["gf", "geelite"]
 from .geeface import *
 __all__ += ["EEarth", "Ecolbox", "Emagebox"]
 from .utilize import *
