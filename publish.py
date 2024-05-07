@@ -23,8 +23,12 @@ if __name__ == "__main__":
     os.system("python setup.py sdist bdist_wheel")
     print("package is built...")
     # push
-    os.system("twine upload --repository-url https://upload.pypi.org/legacy/ dist/*")
-    print("package is publised...")
+    # os.system("twine upload --repository-url https://upload.pypi.org/legacy/ dist/*")
+    try:
+        os.system("twine upload dist/*")
+        print("package is publised...")
+    except Exception as e:
+        print(e)
     if args.clean:
         print("clearing up...")
         new_dirs = [p for p in os.listdir() if p not in cur_dirs]
