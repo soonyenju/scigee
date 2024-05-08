@@ -138,7 +138,53 @@ def get_date(image):
 #     df = df.set_index('DATETIME')
 #     return df
 
-def gee2df(collection_name, lat, lon, date_range, bandnames, scale, radius = None):
+# # deprecated:
+# def gee2df(collection_name, lat, lon, date_range, bandnames, scale, radius = None):
+#     # unit degree, format:
+#     # [minlon, minlat,
+#     #  maxlon, maxlat]
+#     # radius unit deg, scale unit m
+#     if not radius:
+#         radius = scale / 1e5 * 2
+#     roi = ee.Geometry.Rectangle([
+#         lon - radius, lat - radius,
+#         lon + radius, lat+ radius
+#     ])
+#     start_date, end_date = date_range
+
+#     collection = ee.ImageCollection(collection_name)\
+#         .filterBounds(roi).filterDate(start_date, end_date)
+#     # Sort the filtered collection by date in ascending order
+#     collection = collection.sort('system:time_start')
+
+#     def interp_image(image, bandnames, scale):
+#         image = ee.Image(image)
+#         date = image.get('system:time_start')
+
+#         image_bands = image.select(bandnames)
+#         stats = image_bands.reduceRegion(reducer=ee.Reducer.mean(), geometry=roi, scale=scale)
+#         # val = stats.get(bandname)
+#         val_list = [stats.get(bandname) for bandname in bandnames]
+#         return image.set('Info', [date] + val_list)
+
+#     # Map the function to the image collection
+#     # collection = collection.map(interp_image)
+#     collection = collection.map(lambda image: interp_image(image, bandnames, scale))
+
+#     # Use aggregate_array to get the values as an array
+#     array = collection.aggregate_array('Info')
+
+
+#     # Convert the array to a list using getInfo()
+#     array = array.getInfo()
+#     df = pd.DataFrame(array, columns = ['DATETIME'] + bandnames)
+#     df['DATETIME'] = df['DATETIME'].map(
+#         lambda x: datetime.utcfromtimestamp(int(x) // 1000)
+#     )
+#     df = df.set_index('DATETIME')
+#     return df
+
+def gee2df(collection, lat, lon, date_range, bandnames, scale, radius = None):
     # unit degree, format:
     # [minlon, minlat,
     #  maxlon, maxlat]
@@ -151,8 +197,11 @@ def gee2df(collection_name, lat, lon, date_range, bandnames, scale, radius = Non
     ])
     start_date, end_date = date_range
 
-    collection = ee.ImageCollection(collection_name)\
-        .filterBounds(roi).filterDate(start_date, end_date)
+    if type(collection) == str:
+        collection = ee.ImageCollection(collection)
+    else:
+        assert type(collection) == ee.imagecollection.ImageCollection, 'collection invalid.'
+    collection = collection.filterBounds(roi).filterDate(start_date, end_date)
     # Sort the filtered collection by date in ascending order
     collection = collection.sort('system:time_start')
 
