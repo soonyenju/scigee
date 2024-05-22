@@ -251,6 +251,11 @@ def gee2drive(image, roi, name, folder, scale):
     )
     task.start()
 
+def get_status():
+    tasks = ee.data.listOperations()
+    pending_tasks = sum(1 for task in tasks if task['metadata']['state'] == 'PENDING')
+    return pending_tasks
+
 def gee2local(ee_object, filename, scale, roi, user_params = {}, timeout = 300, proxies = None):
     '''
     Code is from geemap (https://github.com/gee-community/geemap)
