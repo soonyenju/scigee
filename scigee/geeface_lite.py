@@ -254,6 +254,28 @@ def draw_image_obs(image: ee.Image, band: str or list, roi: ee.Geometry, to8bit:
     plt.imshow(array)
     plt.show()
 
+def image2drive(collection_name, band_names, roi_bound, date_range, savefolder, scale, crs = 'EPSG:4326'):
+    minlon, minlat, maxlon, maxlat = roi_bound
+    start_date, end_date = date_range
+    roi = ee.Geometry.BBox(minlon, minlat, maxlon, maxlat)
+    collection = (
+        ee.ImageCollection(collection_name)
+        .filterBounds(roi)
+        .filterDate(start_date, end_date)
+    )
+    image = collection.select([band_names]).reduce(ee.Reducer.mean())
+
+    task = ee.batch.Export.image.toDrive(
+        image=image,
+        description=start_date,
+        folder=savefolder,
+        region=roi,
+        scale=scale,
+        maxPixels = 1e13,
+        crs=crs
+    )
+    task.start()
+
 def get_status():
     tasks = ee.data.listOperations()
     pending_tasks = sum(1 for task in tasks if task['metadata']['state'] == 'PENDING')
