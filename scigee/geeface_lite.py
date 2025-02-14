@@ -254,6 +254,11 @@ def draw_image_obs(image: ee.Image, band: str or list, roi: ee.Geometry, to8bit:
     plt.imshow(array)
     plt.show()
 
+def get_status():
+    tasks = ee.data.listOperations()
+    pending_tasks = sum(1 for task in tasks if task['metadata']['state'] == 'PENDING')
+    return pending_tasks
+
 class DataInfo:
     def __init__(self):
       pass
