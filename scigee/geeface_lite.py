@@ -258,12 +258,18 @@ def image2drive(collection_name, band_names, roi_bound, date_range, savefolder, 
     minlon, minlat, maxlon, maxlat = roi_bound
     start_date, end_date = date_range
     roi = ee.Geometry.BBox(minlon, minlat, maxlon, maxlat)
-    collection = (
-        ee.ImageCollection(collection_name)
-        .filterBounds(roi)
-        .filterDate(start_date, end_date)
-    )
-    image = collection.select([band_names]).reduce(ee.Reducer.mean())
+
+    if type(collection_name) == ee.ImageCollection:
+        collection = collection_name
+    elif type(collection_name) == str:
+        collection = (
+            ee.ImageCollection(collection_name)
+            .filterBounds(roi)
+            .filterDate(start_date, end_date)
+        )
+    else:
+        raise Exception("ERROR: Wrong collection type, it must of 'str' or 'ee.ImageCollection'") 
+    image = collection.select(band_names).reduce(ee.Reducer.mean())
 
     task = ee.batch.Export.image.toDrive(
         image=image,
