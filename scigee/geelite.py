@@ -105,93 +105,60 @@ def get_date(image):
     date = ee.Date(image.get('system:time_start'))
     return date.format('Y-M-d HH:mm:ss.SSSS').getInfo()
 
-# # deprecated:
-# def gee2df(collection_name, lat, lon, date_range, bandname, scale, radius = 0.001):
-#     # unit degree, format:
-#     # [minlon, minlat,
-#     #  maxlon, maxlat]
-#     roi = ee.Geometry.Rectangle([
-#         lon - radius, lat - radius, 
-#         lon + radius, lat+ radius
-#     ])
-#     start_date, end_date = date_range
+def collection2ts(collection, roi, date_range, bandnames, scale, radius = None):
+    # radius unit deg, scale unit m
+    # EXAMPLE: collection2ts('MODIS/061/MCD15A3H', [52.51, -0.13], ['2020-01-01', '2020-03-01'], ['Lai'], 500, radius = None)
+    def interp_image(image, bandnames, scale):
+        image = ee.Image(image)
+        date = image.get('system:time_start')
 
-#     collection = ee.ImageCollection(collection_name)\
-#         .filterBounds(roi).filterDate(start_date, end_date)
-#     # Sort the filtered collection by date in ascending order
-#     collection = collection.sort('system:time_start')
+        image_bands = image.select(bandnames)
+        stats = image_bands.reduceRegion(reducer = ee.Reducer.mean(), geometry = roi, scale=scale)
+        # val = stats.get(bandname)
+        val_list = [stats.get(bandname) for bandname in bandnames]
+        return image.set('Info', [date] + val_list)
+    
+    if type(roi) == list:
+        lat, lon = roi
+        if not radius:
+            radius = scale / 1e5 * 2
+        # [minlon, minlat, maxlon, maxlat]
+        roi = ee.Geometry.Rectangle([
+            lon - radius, lat - radius,
+            lon + radius, lat+ radius
+        ])
+    elif type(roi) == gpd.geodataframe.GeoDataFrame:
+        import json
+        geojson_dict = json.loads(roi.dissolve().to_json())
+        roi = ee.FeatureCollection(geojson_dict["features"])
+    else:
+        assert type(roi) == ee.FeatureCollection, 'roi invalid.'
+    start_date, end_date = date_range
 
-#     def interp_image(image, bandname, scale):
-#         image = ee.Image(image)
-#         date = image.get('system:time_start')
+    if type(collection) == str:
+        collection = ee.ImageCollection(collection)
+    else:
+        assert type(collection) == ee.imagecollection.ImageCollection, 'collection invalid.'
+    collection = collection.filterBounds(roi).filterDate(start_date, end_date)
+    # Sort the filtered collection by date in ascending order
+    collection = collection.sort('system:time_start')
 
-#         image_band = image.select(bandname)
-#         stats = image_band.reduceRegion(reducer=ee.Reducer.mean(), geometry=roi, scale=scale)
-#         val = stats.get(bandname)
-#         return image.set('Info', [date, val])
+    # Map the function to the image collection
+    # collection = collection.map(interp_image)
+    collection = collection.map(lambda image: interp_image(image.clip(roi), bandnames, scale))
 
-#     # Map the function to the image collection
-#     # collection = collection.map(interp_image)
-#     collection = collection.map(lambda image: interp_image(image, bandname, scale))
-
-#     # Use aggregate_array to get the values as an array
-#     array = collection.aggregate_array('Info')
-
-
-#     # Convert the array to a list using getInfo()
-#     array = array.getInfo()
-#     df = pd.DataFrame(array, columns = ['DATETIME', 'VALUE'])
-#     df['DATETIME'] = df['DATETIME'].map(
-#         lambda x: datetime.utcfromtimestamp(int(x) // 1000)
-#     )
-#     df = df.set_index('DATETIME')
-#     return df
-
-# # deprecated:
-# def gee2df(collection_name, lat, lon, date_range, bandnames, scale, radius = None):
-#     # unit degree, format:
-#     # [minlon, minlat,
-#     #  maxlon, maxlat]
-#     # radius unit deg, scale unit m
-#     if not radius:
-#         radius = scale / 1e5 * 2
-#     roi = ee.Geometry.Rectangle([
-#         lon - radius, lat - radius,
-#         lon + radius, lat+ radius
-#     ])
-#     start_date, end_date = date_range
-
-#     collection = ee.ImageCollection(collection_name)\
-#         .filterBounds(roi).filterDate(start_date, end_date)
-#     # Sort the filtered collection by date in ascending order
-#     collection = collection.sort('system:time_start')
-
-#     def interp_image(image, bandnames, scale):
-#         image = ee.Image(image)
-#         date = image.get('system:time_start')
-
-#         image_bands = image.select(bandnames)
-#         stats = image_bands.reduceRegion(reducer=ee.Reducer.mean(), geometry=roi, scale=scale)
-#         # val = stats.get(bandname)
-#         val_list = [stats.get(bandname) for bandname in bandnames]
-#         return image.set('Info', [date] + val_list)
-
-#     # Map the function to the image collection
-#     # collection = collection.map(interp_image)
-#     collection = collection.map(lambda image: interp_image(image, bandnames, scale))
-
-#     # Use aggregate_array to get the values as an array
-#     array = collection.aggregate_array('Info')
+    # Use aggregate_array to get the values as an array
+    array = collection.aggregate_array('Info')
 
 
-#     # Convert the array to a list using getInfo()
-#     array = array.getInfo()
-#     df = pd.DataFrame(array, columns = ['DATETIME'] + bandnames)
-#     df['DATETIME'] = df['DATETIME'].map(
-#         lambda x: datetime.utcfromtimestamp(int(x) // 1000)
-#     )
-#     df = df.set_index('DATETIME')
-#     return df
+    # Convert the array to a list using getInfo()
+    array = array.getInfo()
+    df = pd.DataFrame(array, columns = ['DATETIME'] + bandnames)
+    df['DATETIME'] = df['DATETIME'].map(
+        lambda x: datetime.utcfromtimestamp(int(x) // 1000)
+    )
+    df = df.set_index('DATETIME')
+    return df
 
 def gee2df(collection, lat, lon, date_range, bandnames, scale, radius = None):
     # unit degree, format:
@@ -271,6 +238,48 @@ def image2points(image, dfi, scale, longitude = 'longitude', latitude = 'latitud
 
     df_results = pd.concat(results, axis = 0)
     return df_results
+
+def image4shape(image, gdf, scale, to_xarray = False, properties = []):
+    def gdf2ee(gdf):
+        features = []
+
+        for _, row in gdf.iterrows():
+            # Convert geometry to GeoJSON and then to EE Geometry
+            geom = ee.Geometry(row.geometry.__geo_interface__)
+
+            # Convert attributes to a dictionary
+            properties = row.drop('geometry').to_dict()
+
+            # Create an EE Feature
+            feature = ee.Feature(geom, properties)
+            features.append(feature)
+
+        return ee.FeatureCollection(features)
+
+    # Sample the image using the shapefile
+    samples = image.sampleRegions(
+        collection = gdf2ee(gdf),  # FeatureCollection
+        scale = scale,  # Spatial resolution (meters)
+        properties = properties,
+        geometries = True  # Keep geometry for spatial analysis
+    )
+    values = samples.getInfo()
+
+    # Extract elevation, slope, and index (name of point) from the results
+    dfo = []
+    for feature in values['features']:
+        dfo.append(
+            pd.concat([
+                pd.Series(feature['geometry']['coordinates'], index = ['longitude', 'latitude']),
+                pd.Series(feature['properties'])
+            ]).to_frame().T
+        )
+
+    dfo = pd.concat(dfo, axis = 0)
+    if to_xarray:
+        dfo = dfo.sort_values(by = ['latitude', 'longitude']).set_index(['latitude', 'longitude']).to_xarray()
+    return dfo
+
 
 def gee2drive(image, roi, name, folder, scale):
     if not type(roi) == ee.geometry.Geometry:
