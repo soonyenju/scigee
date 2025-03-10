@@ -106,6 +106,7 @@ def get_date(image):
     return date.format('Y-M-d HH:mm:ss.SSSS').getInfo()
 
 def collection2ts(collection, roi, date_range, bandnames, scale, radius = None):
+    import geopandas as gpd
     # radius unit deg, scale unit m
     # EXAMPLE: collection2ts('MODIS/061/MCD15A3H', [52.51, -0.13], ['2020-01-01', '2020-03-01'], ['Lai'], 500, radius = None)
     def interp_image(image, bandnames, scale):
