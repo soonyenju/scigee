@@ -210,6 +210,7 @@ def gee2df(collection, lat, lon, date_range, bandnames, scale, radius = None):
     return df
 
 def image2points(image, dfi, scale, longitude = 'longitude', latitude = 'latitude', batch_size = 100):
+    from tqdm import tqdm
     dfi = dfi.copy().reset_index()
 
     # Split DataFrame into batches using np.array_split (handles uneven splits)
