@@ -241,6 +241,37 @@ def gee2df(collection, lat, lon, date_range, bandnames, scale, radius = None):
     df = df.set_index('DATETIME')
     return df
 
+def image2points(image, dfi, scale, longitude = 'longitude', latitude = 'latitude', batch_size = 100):
+    dfi = dfi.copy().reset_index()
+
+    # Split DataFrame into batches using np.array_split (handles uneven splits)
+    df_batches = np.array_split(dfi, np.ceil(len(dfi) / batch_size))
+
+    # Initialize lists to store results
+    results = []
+
+    # Process each batch
+    for batch in tqdm(df_batches, desc = 'iterating batches...'):
+        if batch.empty: continue
+
+        points = ee.FeatureCollection([
+            ee.Feature(
+                ee.Geometry.Point(lon_, lat_),
+                {**{'longitude': lon_, 'latitude': lat_}, **row.to_dict()}
+            )
+            for (_, row), (lon_, lat_) in zip(batch.iterrows(), zip(batch[longitude], batch[latitude]))
+        ])
+
+        # Sample the image at batch points
+        samples = image.sampleRegions(collection = points, scale = scale)
+
+        # Extract values, and index (name of point) from the results
+        for feature in samples.getInfo()['features']:
+            results.append(pd.Series(feature['properties']).to_frame().T)
+
+    df_results = pd.concat(results, axis = 0)
+    return df_results
+
 def gee2drive(image, roi, name, folder, scale):
     if not type(roi) == ee.geometry.Geometry:
         minlon = roi[0]
