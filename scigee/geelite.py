@@ -241,23 +241,23 @@ def image2points(image, dfi, scale, longitude = 'longitude', latitude = 'latitud
     df_results = pd.concat(results, axis = 0)
     return df_results
 
+def gdf2ee(gdf):
+    features = []
+
+    for _, row in gdf.iterrows():
+        # Convert geometry to GeoJSON and then to EE Geometry
+        geom = ee.Geometry(row.geometry.__geo_interface__)
+
+        # Convert attributes to a dictionary
+        properties = row.drop('geometry').to_dict()
+
+        # Create an EE Feature
+        feature = ee.Feature(geom, properties)
+        features.append(feature)
+
+    return ee.FeatureCollection(features)
+
 def image4shape(image, gdf, scale, to_xarray = False, properties = []):
-    def gdf2ee(gdf):
-        features = []
-
-        for _, row in gdf.iterrows():
-            # Convert geometry to GeoJSON and then to EE Geometry
-            geom = ee.Geometry(row.geometry.__geo_interface__)
-
-            # Convert attributes to a dictionary
-            properties = row.drop('geometry').to_dict()
-
-            # Create an EE Feature
-            feature = ee.Feature(geom, properties)
-            features.append(feature)
-
-        return ee.FeatureCollection(features)
-
     # Sample the image using the shapefile
     samples = image.sampleRegions(
         collection = gdf2ee(gdf),  # FeatureCollection
