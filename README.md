@@ -1,7 +1,9 @@
 # SCIentific Google Earth Engine (scigee)
 
 Author: Dr. Songyan Zhu University of Southampton
+
 Contact: Songyan.Zhu@ed.soton.uk
+
 Website: https://sites.google.com/view/uflux
 
 Python interface with Google Earth Engine, to play, filter, select, visualise, and retrieve GEE datasets.
