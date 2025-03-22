@@ -352,3 +352,49 @@ def gee2local(ee_object, filename, scale, roi, user_params = {}, timeout = 300, 
 
     except Exception as e:
         print(e)
+
+def interactive_map(dataset, vis_params, name, attr = 'Google Earth Engine', opacity = 0.5, base_map = 'terrain'):
+    import folium
+
+    # Ensure opacity is in visualization parameters
+    vis_params["opacity"] = opacity
+
+    # Get a GEE tile layer URL
+    map_id_dict = dataset.getMapId(vis_params)
+    tile_url = map_id_dict['tile_fetcher'].url_format
+
+    # Create a folium map centered at some location
+    m = folium.Map(location = [20, 0], zoom_start=2)
+
+    if base_map == 'satellite':
+        # Add satellite base layer (ESRI Satellite)
+        folium.TileLayer(
+            tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            attr="Esri",
+            name="Satellite",
+            overlay=False
+        ).add_to(m)
+    elif base_map == 'satellite, Google':
+        # Add satellite base layer (Google Satellite)
+        folium.TileLayer(
+            tiles="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+            attr="Google",
+            name="Satellite",
+            overlay=False
+        ).add_to(m)
+
+    # Add GEE layer to folium map with transparency
+    folium.raster_layers.TileLayer(
+        tiles=tile_url,
+        attr=attr,
+        name=name,
+        overlay=True,  # Ensures it can be toggled
+        control=True,
+        opacity=opacity  # Set transparency
+    ).add_to(m)
+
+    # Add layer control
+    folium.LayerControl().add_to(m)
+
+    # Display map
+    return m
