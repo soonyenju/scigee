@@ -320,7 +320,7 @@ def image4shape(image, gdf, scale, to_xarray = False, properties = []):
     return dfo
 
 
-def gee2drive(image, roi, name, folder, scale):
+def gee2drive(image, roi, name, folder, scale, crs='EPSG:4326'):
     if not type(roi) == ee.geometry.Geometry:
         minlon = roi[0]
         maxlon = roi[2]
@@ -335,7 +335,7 @@ def gee2drive(image, roi, name, folder, scale):
         region=roi,
         scale=scale,
         maxPixels = 1e13,
-        crs='EPSG:4326'
+        crs=crs
     )
     task.start()
 
