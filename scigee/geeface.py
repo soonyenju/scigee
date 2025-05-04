@@ -2,6 +2,8 @@ import ee
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 def filter_collection(collection: str, date_range: list, bounds: ee.Geometry) -> str:
     """
@@ -97,6 +99,34 @@ def get_date(image):
     return date.format('Y-M-d HH:mm:ss.SSSS').getInfo()
 
 def collection2ts(collection, roi, date_range, bandnames, scale, radius = None):
+    """
+    Extracts a time series of mean values for specified bands from an Earth Engine ImageCollection
+    over a given region of interest (ROI) and date range.
+
+    Args:
+        collection (str or ee.ImageCollection): The ImageCollection to sample from. Can be a string (e.g. 'MODIS/...') or an ee.ImageCollection object.
+        roi (list, geopandas.GeoDataFrame, or ee.FeatureCollection): The region of interest.
+            - If list: interpreted as [latitude, longitude], with optional radius around the point.
+            - If GeoDataFrame: converted to a FeatureCollection.
+            - If FeatureCollection: used directly.
+        date_range (list of str): Start and end dates in ['YYYY-MM-DD', 'YYYY-MM-DD'] format.
+        bandnames (list of str): Band names to extract time series for.
+        scale (float): Pixel resolution in meters.
+        radius (float, optional): Size of the region buffer (in degrees) if roi is a point. Defaults to 2 × scale / 1e5.
+
+    Returns:
+        pandas.DataFrame: A DataFrame indexed by datetime, containing mean values of specified bands
+        for each image in the collection within the specified ROI and date range.
+
+    Example:
+        df = collection2ts(
+            collection='MODIS/061/MCD15A3H',
+            roi=[52.51, -0.13],
+            date_range=['2020-01-01', '2020-03-01'],
+            bandnames=['Lai'],
+            scale=500
+        )
+    """
     import geopandas as gpd
     # radius unit deg, scale unit m
     # EXAMPLE: collection2ts('MODIS/061/MCD15A3H', [52.51, -0.13], ['2020-01-01', '2020-03-01'], ['Lai'], 500, radius = None)
@@ -343,6 +373,36 @@ def gee2local(ee_object, filename, scale, roi, user_params = {}, timeout = 300, 
 
     except Exception as e:
         print(e)
+
+def get_min_max(dataset, region = [-179.9, -89.9, 179.9, 89.9]):
+    assert len(dataset.bandNames().getInfo()) == 1, 'ERROR: Only one band is accepted.'
+    region = ee.Geometry.Rectangle(region)
+
+    v_min_max = dataset.reduceRegion(
+        reducer=ee.Reducer.percentile([1, 99]),
+        geometry=region,
+        scale=25000,
+        maxPixels=1e13
+    )
+
+    return list(v_min_max.getInfo().values())
+
+def generate_named_palette(colormap_name='jet', n_colors=18):
+    cmap = plt.get_cmap(colormap_name, n_colors)
+    hex_colors = [mcolors.to_hex(cmap(i)) for i in range(n_colors)]
+    return hex_colors
+
+def generate_vis_params(dataset, colormap_name='jet', vmin=None, vmax=None):
+    if (vmin is None) or (vmax is None):
+        vmin, vmax = get_min_max(dataset)
+
+    vis_params = {
+        'min': vmin,
+        'max': vmax,
+        'palette': generate_named_palette(colormap_name=colormap_name)
+    }
+
+    return vis_params
 
 def interactive_map(dataset, vis_params, name, attr = 'Google Earth Engine', opacity = 0.5, base_map = 'terrain'):
     import folium
