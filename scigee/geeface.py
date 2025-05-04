@@ -466,3 +466,44 @@ def interactive_map(dataset, vis_params, name, attr = 'Google Earth Engine', opa
 
     # Display map
     return m
+
+def get_dataset_metadata(dataset_id):
+    """
+    Retrieves metadata for a GEE ImageCollection:
+    - Band names
+    - Pixel scale (approx.)
+    - System properties
+
+    Args:
+        dataset_id (str): GEE ImageCollection ID
+
+    Returns:
+        dict: Metadata information
+    """
+    # Load collection and get first image
+    collection = ee.ImageCollection(dataset_id)
+    first_image = collection.first()
+
+    # Get band names
+    band_names = first_image.bandNames().getInfo()
+
+    # Get projection info from first band
+    band_info = first_image.select(band_names[0]).projection()
+    crs = band_info.crs().getInfo()
+    nominal_scale = band_info.nominalScale().getInfo()
+
+    # Get other image properties
+    properties = first_image.propertyNames().getInfo()
+
+    return {
+        "dataset": dataset_id,
+        "band_names": band_names,
+        "pixel_scale_meters": nominal_scale,
+        "crs": crs,
+        "properties": properties
+    }
+
+# # Example: ERA5 Daily data
+# metadata = get_dataset_metadata("ECMWF/ERA5/DAILY")
+# for key, value in metadata.items():
+#     print(f"{key}: {value}")
