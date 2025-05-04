@@ -3,6 +3,15 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 
+def init_gee(project_name):
+    import ee
+
+    # Trigger the authentication flow.
+    ee.Authenticate()
+
+    # Initialize the library.
+    ee.Initialize(project = project_name)
+
 def filter_collection(collection: str, date_range: list, bounds: ee.Geometry) -> str:
     """
     Get a list (collection) of ee images filtered by date range and ee geometry (point or so).
