@@ -346,6 +346,7 @@ def get_status():
 
 def gee2local(image, savefile, scale, roi, user_params = {}, folder = 'output', description = ''):
     import os, requests, zipfile
+    warnings.warn("gee2local() is an experimental function. Use with caution.", UserWarning)
     params = {
         "crs": 'EPSG:4326',
         "maxPixels": 1e13,
