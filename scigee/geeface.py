@@ -469,16 +469,34 @@ def interactive_map(dataset, vis_params, name, attr = 'Google Earth Engine', opa
 
 def get_dataset_metadata(dataset_id):
     """
-    Retrieves metadata for a GEE ImageCollection:
-    - Band names
-    - Pixel scale (approx.)
-    - System properties
+    Retrieves basic metadata from the first image of a Google Earth Engine (GEE) ImageCollection.
+
+    This function extracts key information such as:
+      - Band names
+      - Pixel resolution (nominal scale) in meters
+      - Coordinate reference system (CRS)
+      - Available image property names
 
     Args:
-        dataset_id (str): GEE ImageCollection ID
+        dataset_id (str): The GEE ImageCollection ID (e.g., "ECMWF/ERA5/DAILY").
 
     Returns:
-        dict: Metadata information
+        dict: A dictionary containing:
+            - "dataset" (str): The dataset ID.
+            - "band_names" (List[str]): List of band names in the first image.
+            - "pixel_scale_meters" (float): Nominal scale (resolution) of the first band, in meters.
+            - "crs" (str): Coordinate reference system of the first band.
+            - "properties" (List[str]): List of property names associated with the first image.
+
+    Example:
+        >>> get_dataset_metadata("ECMWF/ERA5/DAILY")
+        {
+            "dataset": "ECMWF/ERA5/DAILY",
+            "band_names": ["mean_2m_air_temperature", "total_precipitation", ...],
+            "pixel_scale_meters": 27830.71,
+            "crs": "EPSG:4326",
+            "properties": ["system:time_start", "system:index", ...]
+        }
     """
     # Load collection and get first image
     collection = ee.ImageCollection(dataset_id)
