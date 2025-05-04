@@ -357,7 +357,7 @@ def gee2local(image, savefile, scale, roi, user_params = {}, folder = 'output', 
     params["scale"] = scale
     params["region"] = roi
     params.update(user_params)
-    url = modis.getDownloadURL(params)
+    url = image.getDownloadURL(params)
     r = requests.get(url, stream = True, timeout = 300, proxies = None)
     assert r.status_code == 200, "A connection error occurred while downloading."
     assert type(roi) == ee.geometry.Geometry, "`roi` should be an ee.geometry.Geometry object."
