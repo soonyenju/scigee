@@ -198,7 +198,7 @@ def gee2df(collection, lat, lon, date_range, bandnames, scale, radius = None):
     #  maxlon, maxlat]
     # radius unit deg, scale unit m
     warnings.warn(
-        "collection2ts() will be deprecated in version 0.0.5. "
+        "geedf() will be deprecated in version 0.0.5. "
         "Please update your code accordingly.",
         DeprecationWarning,
         stacklevel=2
@@ -344,52 +344,84 @@ def get_status():
     pending_tasks = sum(1 for task in tasks if task['metadata']['state'] == 'PENDING')
     return pending_tasks
 
-def gee2local(ee_object, filename, scale, roi, user_params = {}, timeout = 300, proxies = None):
-    '''
-    Code is from geemap (https://github.com/gee-community/geemap)
-    '''
-    warnings.warn("collection2ts() is an experimental function. Use with caution.", UserWarning)
-    import os, requests, zipfile, pathlib
-    if type(filename) == pathlib.PosixPath:
-        filename = filename.as_posix()
-    filename_zip = filename.replace(".tif", ".zip")
-
+def gee2local(image, savefile, scale, roi, user_params = {}, folder = 'output', description = ''):
+    import os, requests, zipfile
     params = {
-        "dimensions": None,
-        "crs": None,
-        "crs_transform": None,
-        "format": "ZIPPED_GEO_TIFF"
-
+        "crs": 'EPSG:4326',
+        "maxPixels": 1e13,
+        # "crs_transform": None,
+        # "format": "ZIPPED_GEO_TIFF",
+        # "description": None
     }
     params["scale"] = scale
     params["region"] = roi
     params.update(user_params)
+    url = modis.getDownloadURL(params)
+    r = requests.get(url, stream = True, timeout = 300, proxies = None)
+    assert r.status_code == 200, "A connection error occurred while downloading."
+    assert type(roi) == ee.geometry.Geometry, "`roi` should be an ee.geometry.Geometry object."
 
-    try:
-        url = ee_object.getDownloadURL(params)
-        r = requests.get(url, stream = True, timeout = timeout, proxies = proxies)
+    with open(savefile, "wb") as fd:
+        for chunk in r.iter_content(chunk_size = 1024):
+            fd.write(chunk)
 
-        if r.status_code != 200:
-            print("An error occurred while downloading.")
-            return
+    # ------------------------Unzip------------------------
+    savefolder = savefile.parent.joinpath(folder)
+    savefolder.mkdir(parents = True, exist_ok = True)
+    with zipfile.ZipFile(savefile, 'r') as z:
+        z.extractall(savefolder)
+    os.remove(savefile)
+    # ------------------------Rename------------------------
+    for p in savefolder.glob('*.tif'):
+        p.rename(p.parent.joinpath(p.stem.replace('download.', description) + '.tif'))
+    return savefolder
 
-        with open(filename_zip, "wb") as fd:
-            for chunk in r.iter_content(chunk_size = 1024):
-                fd.write(chunk)
+# def gee2local(ee_object, filename, scale, roi, user_params = {}, timeout = 300, proxies = None):
+#     '''
+#     Code is from geemap (https://github.com/gee-community/geemap)
+#     '''
+#     warnings.warn("gee2local() is an experimental function. Use with caution.", UserWarning)
+#     import os, requests, zipfile, pathlib
+#     if type(filename) == pathlib.PosixPath:
+#         filename = filename.as_posix()
+#     filename_zip = filename.replace(".tif", ".zip")
 
-    except Exception as e:
-        print("An error occurred while downloading.")
-        if r is not None:
-            print(r.json()["error"]["message"])
-        return
+#     params = {
+#         "dimensions": None,
+#         "crs": None,
+#         "crs_transform": None,
+#         "format": "ZIPPED_GEO_TIFF"
 
-    try:
-        with zipfile.ZipFile(filename_zip) as z:
-            z.extractall(os.path.dirname(filename))
-        os.remove(filename_zip)
+#     }
+#     params["scale"] = scale
+#     params["region"] = roi
+#     params.update(user_params)
 
-    except Exception as e:
-        print(e)
+#     try:
+#         url = ee_object.getDownloadURL(params)
+#         r = requests.get(url, stream = True, timeout = timeout, proxies = proxies)
+
+#         if r.status_code != 200:
+#             print("An error occurred while downloading.")
+#             return
+
+#         with open(filename_zip, "wb") as fd:
+#             for chunk in r.iter_content(chunk_size = 1024):
+#                 fd.write(chunk)
+
+#     except Exception as e:
+#         print("An error occurred while downloading.")
+#         if r is not None:
+#             print(r.json()["error"]["message"])
+#         return
+
+#     try:
+#         with zipfile.ZipFile(filename_zip) as z:
+#             z.extractall(os.path.dirname(filename))
+#         os.remove(filename_zip)
+
+#     except Exception as e:
+#         print(e)
 
 def get_min_max(dataset, region = [-179.9, -89.9, 179.9, 89.9]):
     assert len(dataset.bandNames().getInfo()) == 1, 'ERROR: Only one band is accepted.'
