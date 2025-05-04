@@ -1,9 +1,18 @@
 import ee
+import warnings
 import numpy as np
 import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+
+def init_gee(project_name):
+    # Trigger the authentication flow.
+    ee.Authenticate()
+
+    # Initialize the library.
+    ee.Initialize(project = project_name)
+
 
 def filter_collection(collection: str, date_range: list, bounds: ee.Geometry) -> str:
     """
@@ -182,11 +191,18 @@ def collection2ts(collection, roi, date_range, bandnames, scale, radius = None):
     df = df.set_index('DATETIME')
     return df
 
+# WILL BE DEPRECATED
 def gee2df(collection, lat, lon, date_range, bandnames, scale, radius = None):
     # unit degree, format:
     # [minlon, minlat,
     #  maxlon, maxlat]
     # radius unit deg, scale unit m
+    warnings.warn(
+        "collection2ts() will be deprecated in version 0.0.5. "
+        "Please update your code accordingly.",
+        DeprecationWarning,
+        stacklevel=2
+    )
     if not radius:
         radius = scale / 1e5 * 2
     roi = ee.Geometry.Rectangle([
@@ -332,6 +348,7 @@ def gee2local(ee_object, filename, scale, roi, user_params = {}, timeout = 300, 
     '''
     Code is from geemap (https://github.com/gee-community/geemap)
     '''
+    warnings.warn("collection2ts() is an experimental function. Use with caution.", UserWarning)
     import os, requests, zipfile, pathlib
     if type(filename) == pathlib.PosixPath:
         filename = filename.as_posix()
