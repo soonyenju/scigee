@@ -75,3 +75,63 @@ def mask_sentinel2sr_clouds(image):
   )
 
   return image.updateMask(mask).divide(10000)
+
+
+# ==============================================================================
+footprint_size = {
+    'BSV': 100,
+    'CRO': 200,
+    'CSH': 200,
+    'CVM': 300,
+    'DBF': 600,
+    'DNF': 600,
+    'EBF': 700,
+    'ENF': 600,
+    'GRA': 150,
+    'MF':  600,
+    'OSH': 200,
+    'SAV': 400,
+    'SNO': 500,
+    'URB': 500,
+    'WAT': 300,
+    'WET': 250,
+    'WSA': 400,
+}
+
+def harmonise_ETM(img):
+    B3_harmonised = img.select('SR_B3') \
+        .multiply(0.9047).add(0.0061).rename('SR_B3_har')
+    B4_harmonised = img.select('SR_B4') \
+        .multiply(0.8462).add(0.0412).rename('SR_B4_har')
+    return img.addBands([B3_harmonised, B4_harmonised])
+
+def radiometric_calibration(img, input_band = 'R', output_band='R_cal'):
+    band = img.select(input_band)
+    band_cal = band.divide(10000).rename(output_band)
+    return img.addBands(band_cal)
+
+def add_ndvi(img, red_band='R', nir_band='NIR', output_band='NDVI'):
+    red = img.select(red_band)
+    nir = img.select(nir_band)
+    ndvi = nir.subtract(red).divide(nir.add(red)).rename(output_band)
+    return img.addBands(ndvi)
+
+def add_nirv(img, red_band='R', nir_band='NIR', output_band='NIRv'):
+    red = img.select(red_band)
+    nir = img.select(nir_band)
+    ndvi = nir.subtract(red).divide(nir.add(red))
+    nirv = ndvi.multiply(nir).rename(output_band)
+    return img.addBands(nirv)
+
+def add_kndvi(img, red_band='R', nir_band='NIR', output_band='kNDVI'):
+    red = img.select(red_band)
+    nir = img.select(nir_band)
+    ndvi = nir.subtract(red).divide(nir.add(red))
+    kndvi = ndvi.pow(2).tanh().rename(output_band)
+    return img.addBands(kndvi)
+
+def add_evi2(img, red_band='R', nir_band='NIR', output_band='EVI2'):
+    red = img.select(red_band)
+    nir = img.select(nir_band)
+    evi2 = nir.subtract(red).multiply(2.5).divide(nir.add(red.multiply(2.4)).add(1)).rename(output_band)
+    return img.addBands(evi2)
