@@ -339,10 +339,95 @@ def gee2drive(image, roi, name, folder, scale, crs='EPSG:4326'):
     )
     task.start()
 
-def get_status():
-    tasks = ee.data.listOperations()
-    pending_tasks = sum(1 for task in tasks if task['metadata']['state'] == 'PENDING')
-    return pending_tasks
+# # DEPRECATED:
+# def get_status():
+#     tasks = ee.data.listOperations()
+#     pending_tasks = sum(1 for task in tasks if task['metadata']['state'] == 'PENDING')
+#     return pending_tasks
+
+def get_status(stats = True):
+    def summarize_status(df):
+        # Count operations per state
+        status_counts = df['state'].value_counts().to_frame(name='INFO')
+
+        # Calculate durations in seconds for COMPLETED only
+        completed_df = df[df['state'] == 'SUCCEEDED'].copy()
+        completed_df['duration_sec'] = (completed_df['endTime'] - completed_df['startTime']).dt.total_seconds()
+
+        # Total time in human-readable form
+        total_duration_sec = completed_df['duration_sec'].sum()
+        total_duration_min = total_duration_sec / 60
+        total_duration_hr = total_duration_sec / 3600
+
+        # Build summary table
+        summary = status_counts.copy()
+        summary.loc['TOTAL'] = summary['INFO'].sum()
+
+        # Add time stats as separate info
+        time_summary = pd.Series({
+            # 'total_completed_tasks': len(completed_df),
+            # 'total_duration_sec': total_duration_sec,
+            'total_duration_min': round(total_duration_min, 2),
+            'total_duration_hr': round(total_duration_hr, 2),
+            'mean_duration_sec': round(completed_df['duration_sec'].mean(), 2),
+            'max_duration_min': round(completed_df['duration_sec'].max() / 60, 2),
+            'min_duration_min': round(completed_df['duration_sec'].min() / 60, 2),
+            'estimated_pending_min': round(summary.loc['PENDING', 'INFO'] * completed_df['duration_sec'].mean() / 60, 2),
+            'estimated_pending_hr': round(summary.loc['PENDING', 'INFO'] * completed_df['duration_sec'].mean() / 3600, 2),
+        }, name = 'INFO')
+
+        return pd.concat([summary, time_summary])
+
+    # Get all operations
+    operations = ee.data.listOperations()
+
+    # Extract relevant fields into a flat list of dicts
+    rows = []
+    for op in operations:
+        meta = op.get('metadata', {})
+        stages = meta.get('stages', [])
+        
+        # Handle up to two stages (extendable if needed)
+        stage1 = stages[0] if len(stages) > 0 else {}
+        stage2 = stages[-1] if len(stages) > 1 else {}
+
+        rows.append({
+            'name': op.get('name'),
+            'type': meta.get('type'),
+            'description': meta.get('description'),
+            'state': meta.get('state'),
+            'createTime': meta.get('createTime'),
+            'startTime': meta.get('startTime'),
+            'endTime': meta.get('endTime'),
+            'attempt': meta.get('attempt'),
+            'progress': meta.get('progress'),
+            'projectId': meta.get('projectId'),
+            'error': meta.get('error', {}).get('message') if 'error' in meta else None,
+            'batchEecuUsageSeconds': meta.get('batchEecuUsageSeconds'),
+            # Flatten stage 1 (beginning)
+            'stage1_displayName': stage1.get('displayName'),
+            'stage1_description': stage1.get('description'),
+            'stage1_completeWorkUnits': stage1.get('completeWorkUnits'),
+            'stage1_totalWorkUnits': stage1.get('totalWorkUnits'),
+            # Flatten stage 2 (final)
+            'stage2_displayName': stage2.get('displayName'),
+            'stage2_description': stage2.get('description'),
+            'stage2_completeWorkUnits': stage2.get('completeWorkUnits'),
+            'stage2_totalWorkUnits': stage2.get('totalWorkUnits'),
+        })
+
+    # Convert to DataFrame
+    df = pd.DataFrame.from_dict(rows).set_index('createTime')
+    df['endTime'] = df['endTime'].fillna(df['startTime'])
+    df.index = pd.to_datetime(df.index, format='ISO8601')
+    df['startTime'] = pd.to_datetime(df['startTime'], format='ISO8601')
+    df['endTime'] = pd.to_datetime(df['endTime'], format='ISO8601')
+    df.sort_index(ascending=False, inplace=True)
+
+    if stats: 
+        return summarize_status(df)
+    else:
+        return df
 
 def gee2local(image, savefile, scale, roi, user_params = {}, folder = 'output', description = ''):
     import os, requests, zipfile
