@@ -349,32 +349,35 @@ def get_status(stats = True):
     def summarize_status(df):
         # Count operations per state
         status_counts = df['state'].value_counts().to_frame(name='INFO')
-
-        # Calculate durations in seconds for COMPLETED only
-        completed_df = df[df['state'] == 'SUCCEEDED'].copy()
-        completed_df['duration_sec'] = (completed_df['endTime'] - completed_df['startTime']).dt.total_seconds()
-
-        # Total time in human-readable form
-        total_duration_sec = completed_df['duration_sec'].sum()
-        total_duration_min = total_duration_sec / 60
-        total_duration_hr = total_duration_sec / 3600
-
+    
         # Build summary table
         summary = status_counts.copy()
         summary.loc['TOTAL'] = summary['INFO'].sum()
+        if 'SUCCEEDED' in summary.index:
+            # Calculate durations in seconds for COMPLETED only
+            completed_df = df[df['state'] == 'SUCCEEDED'].copy()
+            completed_df['duration_sec'] = (completed_df['endTime'] - completed_df['startTime']).dt.total_seconds()
 
-        # Add time stats as separate info
-        time_summary = pd.Series({
-            # 'total_completed_tasks': len(completed_df),
-            # 'total_duration_sec': total_duration_sec,
-            'total_duration_min': round(total_duration_min, 2),
-            'total_duration_hr': round(total_duration_hr, 2),
-            'mean_duration_sec': round(completed_df['duration_sec'].mean(), 2),
-            'max_duration_min': round(completed_df['duration_sec'].max() / 60, 2),
-            'min_duration_min': round(completed_df['duration_sec'].min() / 60, 2),
-            'estimated_pending_min': round(summary.loc['PENDING', 'INFO'] * completed_df['duration_sec'].mean() / 60, 2),
-            'estimated_pending_hr': round(summary.loc['PENDING', 'INFO'] * completed_df['duration_sec'].mean() / 3600, 2),
-        }, name = 'INFO')
+            # Total time in human-readable form
+            total_duration_sec = completed_df['duration_sec'].sum()
+            total_duration_min = total_duration_sec / 60
+            total_duration_hr = total_duration_sec / 3600
+
+            # Add time stats as separate info
+            time_summary = pd.Series({
+                # 'total_completed_tasks': len(completed_df),
+                # 'total_duration_sec': total_duration_sec,
+                'total_duration_min': round(total_duration_min, 2),
+                'total_duration_hr': round(total_duration_hr, 2),
+                'mean_duration_sec': round(completed_df['duration_sec'].mean(), 2),
+                'max_duration_min': round(completed_df['duration_sec'].max() / 60, 2),
+                'min_duration_min': round(completed_df['duration_sec'].min() / 60, 2),
+            }, name = 'INFO')
+            if 'PENDING' in summary.index:
+                time_summary['estimated_pending_min'] = round(summary.loc['PENDING', 'INFO'] * completed_df['duration_sec'].mean() / 60, 2)
+                time_summary['estimated_pending_hr'] = round(summary.loc['PENDING', 'INFO'] * completed_df['duration_sec'].mean() / 3600, 2)
+        else:
+            time_summary = pd.Series({}, name = 'INFO')
 
         return pd.concat([summary, time_summary])
 
