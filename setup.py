@@ -13,7 +13,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name = "scigee",
-	version = "0.0.35",
+	version = "0.0.36",
 	keywords = ("easy geo warpper", "atmospheric data","satellite data", "flux"),
 	description = "For faster proccessing geofile",
 	long_description = "Read/write and process rs/gis related data, especially atmospheric rs data.",
@@ -21,7 +21,7 @@ setup(
 
 	url="https://github.com/soonyenju/scigee",
 	author = "Songyan Zhu",
-	author_email = "soonyenju@foxmail.com",
+	author_email = "Songyan.Zhu@outlool.com",
 
 	packages = find_packages(),
 	include_package_data = True,
